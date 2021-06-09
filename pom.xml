@@ -93,7 +93,7 @@
                         <phase>post-integration-test</phase>
                         <goals>
                             <goal>stop</goal>
-                            <goal>push</goal>
+<!--                            <goal>push</goal>-->
                         </goals>
                     </execution>
                 </executions>
@@ -117,11 +117,11 @@
                             </run>
                         </image>
                     </images>
-                    <registry>registry.hub.docker.com/fa1ix</registry>
-                    <authConfig>
-                        <username>fa1ix</username>
-                        <password></password>
-                    </authConfig>
+<!--                    <registry>registry.hub.docker.com/fa1ix</registry>-->
+<!--                    <authConfig>-->
+<!--                        <username></username>-->
+<!--                        <password></password>-->
+<!--                    </authConfig>-->
                 </configuration>
             </plugin>
         </plugins>
