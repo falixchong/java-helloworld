@@ -59,5 +59,5 @@ dt.getDay();           // 4
 dt.getHours();         // 0
 dt.getMinutes();       // 0
 dt.getSeconds();       // 0
-document.getElementById("datetime").innerHTML = dt.getDate() + "-" + dt.getMonth() + 1 + "-" + dt.getFullYear() + " " +
+document.getElementById("datetime").innerHTML = dt.getDate() + "-" + (dt.getMonth()+1) + "-" + dt.getFullYear() + " " +
                                                     dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
