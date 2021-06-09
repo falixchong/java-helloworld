@@ -50,3 +50,14 @@ function prettyJson(str){
 	return window.JSON ? JSON.stringify(JSON.parse(str), null, '  ') : str;
 }
 
+
+var dt = new Date();
+dt.getFullYear();      // 1980
+dt.getMonth();         // 6
+dt.getDate();          // 31
+dt.getDay();           // 4
+dt.getHours();         // 0
+dt.getMinutes();       // 0
+dt.getSeconds();       // 0
+document.getElementById("datetime").innerHTML = dt.getDate() + "-" + dt.getMonth() + 1 + "-" + dt.getFullYear() + " " +
+                                                    dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();

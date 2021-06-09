@@ -107,11 +107,11 @@
                             </build>
                             <run>
                                 <ports>
-                                    <port>80:9080</port>
+                                    <port>9080:9080</port>
                                 </ports>
                                 <wait>
                                     <!-- Check for this URL to return a 200 return code .... -->
-                                    <url>http://localhost</url>
+                                    <url>http://localhost:9080</url>
                                     <time>120000</time>
                                 </wait>
                             </run>
