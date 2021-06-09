@@ -67,3 +67,29 @@ Ready to learn how to interact with a database? Check out this [Sample and tutor
 For help generating other Liberty samples checkout the Liberty App Accelerator at [wasdev.net/accelerate](http://wasdev.net/accelerate)
 
 [Liberty Maven Plug-in]: https://github.com/WASdev/ci.maven
+
+
+# Adding JavaHelloWorldApp.war into docker
+```
+docker pull websphere-liberty
+```
+
+```
+docker run -d -p 80:9080 --name=app -v $PWD/target/JavaHelloWorldApp.war:/config/dropins/app.war websphere-liberty
+```
+
+Dockerfile
+```
+FROM websphere-liberty
+ADD ./target/JavaHelloWorldApp.war /config/dropins/app.war
+```
+
+Build Dockerfile
+```
+docker build -t app .
+```
+
+Run docker image
+```
+docker run -d -p 80:9080 --name=app app
+```
