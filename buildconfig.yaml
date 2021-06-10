@@ -1,0 +1,146 @@
+kind: "BuildConfig"
+apiVersion: build.openshift.io/v1
+metadata:
+  name: "cp4a-pipeline"
+spec:
+  triggers:
+    - github:
+        secret: 5Mlic4Le
+      type: GitHub
+    - generic:
+        secret: FiArdDBH
+      type: Generic
+  strategy:
+    type: JenkinsPipeline
+    jenkinsPipelineStrategy:
+      jenkinsfile: |
+        // Begin replacing Jenkinsfile here
+        // Set project names
+        def devProj    = "cp4a"
+        def testProj   = "cp4a-uat"
+        def prodProj   = "cp4a-prod"
+        def app_name   = "java-helloworld"
+        def svc_name   = "java-helloworld"
+        def route_name   = "java-helloworld"
+        pipeline {
+          agent any
+          stages{
+            stage ("Test DEV Service") {
+              steps{
+                echo '*** Test DEV Started ***'
+                script{
+                  openshift.withCluster() {
+                    openshift.withProject("${devProj}") {
+                      // check application deployed
+                      def deployment = openshift.selector("deployment", "${app_name}").object()
+                      while (deployment.spec.replicas != deployment.status.availableReplicas) {
+                        sleep 1
+                      }
+                      // check service is working
+                      def connected = openshift.verifyService("${svc_name}")
+                      if (connected) {
+                        echo "Able to connect to ${svc_name}"
+                      } else {
+                        echo "Unable to connect to ${svc_name}"
+                      }
+                      // check routes is working
+                      def route = openshift.selector("route", "${route_name}").object()
+                      def the_route = "${route.spec.host}"
+                      echo "route: ${the_route}"
+                      sh "curl -s http://${the_route}/app/ | grep 'Hello World!'"
+                    }
+                  }
+                }
+                echo '*** Test DEV Completed ***'
+              }
+            }
+            stage ("Deploy UAT Service") {
+              steps{
+                echo '*** Deploy UAT Started ***'
+                script{
+                  openshift.withCluster() {
+                    openshift.withProject("${testProj}") {
+                      // Create a 'uatready' image stream tag, which will trigger uat deployment
+                      openshift.tag("${devProj}/${app_name}:latest", "${devProj}/${app_name}:uatready")
+                      // check application deployed
+                      def deployment = openshift.selector("deployment", "${app_name}").object()
+                      while (deployment.spec.replicas != deployment.status.availableReplicas) {
+                        sleep 1
+                      }
+                    }
+                  }
+                }
+                echo '*** Deploy UAT Completed ***'
+              }
+            }
+            stage ("Test UAT Service") {
+              steps{
+                echo '*** Test UAT Service Started ***'
+                script{
+                  openshift.withCluster() {
+                    openshift.withProject("${testProj}") {
+                      // check service is working
+                      def connected = openshift.verifyService("${svc_name}")
+                      if (connected) {
+                        echo "Able to connect to ${svc_name}"
+                      } else {
+                        echo "Unable to connect to ${svc_name}"
+                      }
+                      // check routes is working
+                      def route = openshift.selector("route", "${route_name}").object()
+                      def the_route = "${route.spec.host}"
+                      echo "route: ${the_route}"
+                      sh "curl -s http://${the_route}/app/ | grep 'Hello World!'"
+                    }
+                  }
+                }
+                echo '*** Test UAT Service Completed ***'
+              }
+            }
+            stage ("Deploy PROD Service") {
+              steps{
+                echo '*** Waiting for Input ***'
+                echo '*** Deploy PROD Started ***'
+                script{
+                  openshift.withCluster() {
+                    openshift.withProject("${prodProj}") {
+                      input message: 'Should we deploy to Production?', ok: "Promote"
+                      // Create a 'prodready' image stream tag, which will trigger prod deployment
+                      openshift.tag("${devProj}/${app_name}:uatready", "${devProj}/${app_name}:prodready")
+                      // check application deployed
+                      def deployment = openshift.selector("deployment", "${app_name}").object()
+                      while (deployment.spec.replicas != deployment.status.availableReplicas) {
+                        sleep 1
+                      }
+                    }
+                  }
+                }
+                echo '*** Deploy PROD Completed ***'
+              }
+            }
+            stage ("Test PROD Service") {
+              steps{
+                echo '*** Test PROD Service Started ***'
+                script{
+                  openshift.withCluster() {
+                    openshift.withProject("${prodProj}") {
+                      // check service is working
+                      def connected = openshift.verifyService("${svc_name}")
+                      if (connected) {
+                        echo "Able to connect to ${svc_name}"
+                      } else {
+                        echo "Unable to connect to ${svc_name}"
+                      }
+                      // check routes is working
+                      def route = openshift.selector("route", "${route_name}").object()
+                      def the_route = "${route.spec.host}"
+                      echo "route: ${the_route}"
+                      sh "curl -s http://${the_route}/app/ | grep 'Hello World!'"
+                    }
+                  }
+                }
+                echo '*** Test PROD Service Completed ***'
+              }
+            }
+          }
+        }
