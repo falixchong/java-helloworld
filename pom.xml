@@ -111,7 +111,7 @@
                                 </ports>
                                 <wait>
                                     <!-- Check for this URL to return a 200 return code .... -->
-                                    <url>http://localhost:9080</url>
+                                    <url>http://localhost:9080/app</url>
                                     <time>120000</time>
                                 </wait>
                             </run>
