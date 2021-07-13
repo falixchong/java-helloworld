@@ -1,3 +1,5 @@
-FROM websphere-liberty:21.0.0.5-full-java8-ibmjava
+FROM websphere-liberty:latest
+USER root
 ADD ./target/JavaHelloWorldApp.war /config/dropins/app.war
 EXPOSE 9080
+USER 1001
