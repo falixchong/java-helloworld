@@ -34,9 +34,11 @@ docker run -d -p 80:9080 --name=app -v $PWD/target/JavaHelloWorldApp.war:/config
 
 Dockerfile
 ```
-FROM websphere-liberty
-ADD ./target/JavaHelloWorldApp.war /config/dropins/app.war
+FROM websphere-liberty:latest
+USER root
+COPY --chown=1001:0 ./target/JavaHelloWorldApp.war /config/dropins/app.war
 EXPOSE 9080
+USER 1001
 ```
 
 Build Dockerfile
